@@ -435,6 +435,49 @@ in which case no storage will be used.
 )
 
 
+def _default_reraise_exceptions():
+    """
+    Returns a tuple of exceptions that Hypothesis should re-raise by default.
+
+    For now, this is the exceptions which means "skip this test" in our
+    supported Python test runners.
+    """
+    import unittest
+    exceptions = [unittest.SkipTest]
+
+    try:
+        from unittest2 import SkipTest
+        exceptions.append(SkipTest)
+    except ImportError:
+        pass
+
+    try:
+        from pytest.runner import Skipped
+        exceptions.append(Skipped)
+    except ImportError:
+        pass
+
+    try:
+        from nose.plugins.skip import Skip as NoseSkip
+        exceptions.append(NoseSkip)
+    except ImportError:
+        pass
+
+    return tuple(exceptions)
+
+
+settings.define_setting(
+    'reraise_exceptions',
+    default=_default_reraise_exceptions(),
+    show_default=False,
+    description="""
+Any exceptions that should be raised immediately if spotted during a test.
+Re-raising an exception means Hypothesis will stop running the test and
+example shrink (e.g. if a SkipTest exception is raised).
+"""
+)
+
+
 @unique
 class Phase(IntEnum):
     explicit = 0

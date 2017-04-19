@@ -46,6 +46,8 @@ from hypothesis.internal.reflection import nicerepr, arg_string, \
     get_pretty_function_description
 from hypothesis.searchstrategy.strategies import SearchStrategy
 
+import unittest
+
 
 def new_random():
     import random
@@ -459,8 +461,8 @@ def given(*generator_arguments, **generator_kwargs):
                     data.mark_invalid()
                 except (
                     HypothesisDeprecationWarning, FailedHealthCheck,
-                    StopTest, unittest.SkipTest,
-                ):
+                    StopTest
+                ) + settings.reraise_exceptions:
                     raise
                 except Exception:
                     escalate_hypothesis_internal_error()
