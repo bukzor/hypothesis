@@ -39,6 +39,18 @@ def capture_out():
         sys.stdout = old_out
 
 
+@contextlib.contextmanager
+def capture_err():
+    old_err = sys.stderr
+    try:
+        new_err = BytesIO() if PY2 else StringIO()
+        sys.stderr = new_err
+        with with_reporter(default):
+            yield new_err
+    finally:
+        sys.stderr = old_err
+
+
 class ExcInfo(object):
     pass
 
